@@ -1,0 +1,54 @@
+﻿@using Microsoft.Ajax.Utilities
+@model SSIS.View_Models.AssignDeptRepViewModel
+@{
+    ViewBag.Title = "Assign Representative";
+    Layout = "~/Views/Shared/Employee/_Layout.cshtml";
+}
+<link rel="stylesheet" type="text/css" href="https://unpkg.com/lightpick@latest/css/lightpick.css">
+<style>
+
+
+
+    .input-validation-error {
+        border: red solid 2px;
+    }
+
+    .field-validation-error {
+        color: red;
+    }
+</style>
+
+<div class="text-center">
+    <h2>Assign Representative</h2>
+</div>
+
+
+<div class="form-group">
+    <label>Current Representative :</label>
+    @Model.Department.DepartmentRepresentative.IfNotNull(s => s.UserName, "Not Assigned")
+    <br />
+
+    <label for="CurrentCollectionPoint">Current Collection Point :</label>
+    @Model.Department.CollectionPoint.IfNotNull(s => s.Place, "Not Assigned")
+
+
+</div>
+@using (Html.BeginForm("ValidAssignDeptRep", "DeptHead", FormMethod.Post, new { @class = "form-group", id = "form" }))
+{
+    <div class="form-group">
+        <label for="UserName">Select New Representative</label>
+        @Html.DropDownListFor(m => m.AssignTo.UserId, new SelectList(Model.Employees, "UserId", "UserName"), "Select", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.AssignTo.UserId)
+        <br />
+        <label for="CollectionPoint">Select Collection Point</label>
+        @Html.DropDownListFor(m => m.CollectionPoint.CollectionPointId, new SelectList(Model.CollectionPoints, "CollectionPointId", "Place"), "Select", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.CollectionPoint.CollectionPointId)
+
+        @Html.AntiForgeryToken()
+        <br /> <br />
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Assign</button>
+        </div>
+
+    </div>
+}

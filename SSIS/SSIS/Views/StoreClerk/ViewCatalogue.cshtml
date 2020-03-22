@@ -1,0 +1,138 @@
+﻿@model List<SSIS.View_Models.QuantityRecommendationViewModel>
+
+@{
+    ViewBag.Title = "Stock List";
+    Layout = "~/Views/Shared/Store/_Layout.cshtml";
+}
+
+<div class="text-center">
+    <h2>Stock List</h2>
+</div>
+
+
+@if (Model.Count != 0)
+{
+    <table id="tableReq" class="table table-bordered table-head-bg-info table-bordered-bd-info">
+        <thead>
+            <tr>
+                <th>Item Code</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Reorder Level</th>
+                <th>Current Quantity</th>
+                <th>Unit of Measure</th>
+                <th>Recommended Quantity for next half</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td> <a href="/StoreClerk/EditItem?iCode=@item.Item.ItemCode">@item.Item.ItemCode</a> </td>
+                    <td>@item.Item.Category</td>
+                    <td>@item.Item.Description</td>
+                    <td>@item.Item.ReorderLevel</td>
+                    @if (item.Item.CurrentQuantity < 0)
+                    {
+                        <td class="table-danger">0</td>
+                    }
+                    else if (item.Item.CurrentQuantity < item.Item.ReorderLevel)
+                    {
+                        <td class="table-danger">@item.Item.CurrentQuantity</td>
+                    }
+                    else
+                    {
+                        <td class="table-success">@item.Item.CurrentQuantity</td>
+
+                    }
+
+                    <td>@item.Item.UnitOfMeasure</td>
+                    <td>
+                        @if (item.recommend_Qty == -1)
+                        {
+                            @:Flask is in offline
+                        }
+                        else
+                        {
+                            @item.recommend_Qty
+                        }
+                    </td>
+                    @if (item.Item.IsActive)
+                    {
+                        <td class="bg-success text-white">Active</td>
+                    }
+                    else
+                    {
+                        <td class="bg-warning text-white">Inactive</td>
+                    }
+                    <td>
+                        <button class="btn btn-info btn-xs text-white anchorDetail" data-id="@item.Item.ItemCode">Stock Card</button>
+                        <a href="/StoreClerk/createVoucher/@item.Item.ItemCode" class="btn btn-warning btn-xs text-white">Create Voucher</a>
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+
+    </table>
+
+    <div class="text-center">
+        <a href="/Report/ItemInventoryReport" class="btn btn-outline-primary">Stock Report</a>
+    </div>
+}
+else
+{
+    @:There is no item to show.
+}
+
+<div id='myModal' class='modal'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script>
+        $(document).ready(function () {
+            $('#tableReq').DataTable();
+        });
+
+
+        var TeamDetailPostBackURL = '/StoreClerk/stockCard';
+        $(function () {
+            $("#tableReq").on("click", ".anchorDetail", function () {
+                var $buttonClicked = $(this);
+                var id = $buttonClicked.attr('data-id');
+                var options = { "backdrop": "static", keyboard: true };
+                $.ajax({
+                    type: "GET",
+                    url: TeamDetailPostBackURL,
+                    contentType: "application/json; charset=utf-8",
+                    data: { "Id": id },
+                    datatype: "json",
+                    success: function (data) {
+                        $('#myModalContent').html(data);
+                        $('#myModal').modal(options);
+                        $('#myModal').modal('show');
+
+                    },
+                    error: function () {
+                        alert("Dynamic content load failed.");
+                    }
+                });
+            });
+
+            $("#closbtn").click(function () {
+                $('#myModal').modal('hide');
+            });
+        });
+    </script>
+}

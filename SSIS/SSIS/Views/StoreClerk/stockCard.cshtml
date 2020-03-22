@@ -1,0 +1,38 @@
+﻿
+@model SSIS.View_Models.StockCardViewModel
+
+
+<div class="modal-header text-center">
+    <h5 class="modal-title"> @Model.StockCards[0].Item.Description</h5>
+</div>
+
+<hr />
+<dl class="dl-horizontal">
+    <div class="container">
+        <table class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Dept/Supplier</th>
+                    <th>Change Quantity</th>
+                    <th>Balance</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (var i = 0; i < Model.StockCards.Count; i++)
+                {
+                    <tr>
+                        <td>@Model.StockCards[i].TransactionDate.ToString("d")</td>
+                        <td>@Model.StockCards[i].Comments</td>
+                        <td>@Model.StockCards[i].ChangeInQuantity</td>
+                        <td>@Model.StockCards[i].Balance</td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    </div>
+</dl>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+</div>

@@ -1,0 +1,242 @@
+﻿@model SSIS.View_Models.GenerateCategoryViewModel
+
+@{
+    ViewBag.Title = "Report Category";
+    Layout = "~/Views/Shared/Store/_Layout.cshtml";
+}
+
+<link rel="stylesheet" type="text/css" href="https://unpkg.com/lightpick@latest/css/lightpick.css">
+@{
+    var labelstring = "";
+    for (int i = 0; i < Model.ReportItems.Count; i++)
+    {
+        labelstring = labelstring + "'" + Model.ReportItems[i].Item.Description + "'";
+        if (i != Model.ReportItems.Count - 1)
+        {
+            labelstring = labelstring + ",";
+        }
+    }
+
+    var disbursestring = "";
+    for (int i = 0; i < Model.ReportItems.Count; i++)
+    {
+        disbursestring = disbursestring + "'" + Model.ReportItems[i].DisbursedQty + "'";
+        if (i != Model.ReportItems.Count - 1)
+        {
+            disbursestring = disbursestring + ",";
+        }
+    }
+
+    var requeststring = "";
+    for (int i = 0; i < Model.ReportItems.Count; i++)
+    {
+        requeststring = requeststring + "'" + Model.ReportItems[i].RequestedQty + "'";
+        if (i != Model.ReportItems.Count - 1)
+        {
+            requeststring = requeststring + ",";
+        }
+    }
+}
+
+<div class="text-center">
+    <h2>Item Category Report</h2>
+</div>
+
+@using (Html.BeginForm("GenerateCategory", "StoreClerk", FormMethod.Post, new { @class = "form-group", id = "category" }))
+{
+    <div class="form-group">
+
+        <label for="Department">Select Category</label>
+        @Html.DropDownListFor(m => m.catCode, new SelectList(Model.categorylist, "categorylist"), new { @class = "form-control" })
+        <br />
+
+        <label for="FromDate">From Date</label>
+        @Html.TextBoxFor(m => m.FromDate, new { @class = "form-control", placeholder = "DD/MM/YYYY", autocomplete = "off" })
+
+        <br />
+        <label for="ToDate">To Date</label>
+        @Html.TextBoxFor(m => m.ToDate, new { @class = "form-control", placeholder = "DD/MM/YYYY", autocomplete = "off" })
+        <br />
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary" style="text-align:center">Submit</button>
+        </div>
+    </div>
+
+}
+
+<div id="container" style="width: 75%;">
+    @if (Model.ReportItems.Count != 0)
+    {
+        <canvas id="canvas"> </canvas>
+    }
+    else
+    {
+        <div class="text-center">
+            <br />
+            <h2>Nothing to display</h2>
+        </div>
+    }
+</div>
+
+<br />
+<br />
+<br />
+<br />
+
+
+@if (Model.ReportItems.Count != 0)
+{
+    <div class="text-center">
+        <h2>Table Chart</h2>
+
+    </div>
+    <table id="tableReq" class="table table-bordered table-head-bg-info table-bordered-bd-info">
+        <thead>
+            <tr>
+                <th>Item Description</th>
+                <th>Requested Quantity</th>
+                <th>Disbursed Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var item in Model.ReportItems)
+            {
+                <tr>
+                    <td>@item.Item.Description </td>
+                    <td>@item.RequestedQty</td>
+                    <td>@item.DisbursedQty</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+<script src="~/Scripts/Chart.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+<script src="https://unpkg.com/lightpick@1.5.2/lightpick.js"></script>
+<script>
+
+    var picker = new Lightpick({
+        dropdowns: {
+            years: {
+                min: 2019,
+                max: null,
+            },
+            months: true,
+        },
+        field: document.getElementById('FromDate'),
+        secondField: document.getElementById('ToDate'),
+        singleDate: false,
+        selectForward: true,
+        repick: true,
+        startDate: moment().startOf('month').subtract(1, 'year'),
+        endDate: moment(),
+        minDate: moment().startOf('month').subtract(1, 'year'),
+        maxDate: moment(),
+
+
+
+
+
+    });
+
+
+</script>
+
+<script>
+        var barChart;
+        function loadChart() {
+            var color = Chart.helpers.color;
+            var barChartData = {
+                labels: labelst,
+                datasets: [{
+                    label: 'Requested Quantity',
+                    borderWidth: 1,
+                    backgroundColor: '#4F81BC',
+                    data: labelrequest
+                }, {
+                    label: 'Disbursed Quantity',
+                    borderWidth: 1,
+                    backgroundColor: '#C0504E',
+                    data: labeldisburse
+                }]
+
+            };
+
+            var ctx = document.getElementById('canvas').getContext('2d');
+            barChart = new Chart(ctx, {
+                type: 'bar',
+                data: barChartData,
+                options: {
+                    responsive: true,
+                    legend:
+                    {
+                        position: 'top',
+                    },
+                    title:
+                    {
+                        display: true,
+                        text: 'Requested vs Disbursed by Item Category'
+                    },
+                    scales: {
+                        yAxes : [{
+                            ticks : {
+                                min : 0
+                            }
+                        }]
+                    }
+                }
+            });
+
+        }
+
+
+
+
+
+        var labelst = [@Html.Raw(labelstring)];
+        var labeldisburse = [@Html.Raw(disbursestring)];
+        var labelrequest = [@Html.Raw(requeststring)];
+
+
+        loadChart()
+
+        /* var changedText = document.getElementById('depId');
+        changedText.addEventListener("change", listQ);
+        function listQ() {
+            var depCode = changedText.value;
+            console.log(depCode)
+
+               labelst = [];
+         labeldisburse = [];
+             labelrequest = [];
+
+            $.ajax({
+                type: "GET",
+                url: "/api/Item/getReportData",
+                contentType: "application/json; charset=utf-8",
+                data: { "depcode": depCode },
+                datatype: "json",
+                success: function (data) {
+                    barChart.destroy();
+                    data.forEach(function (entry) {
+                        labelst.push(entry.Item.Description)
+                        labeldisburse.push(entry.DisbursedQty);
+                        labelrequest.push(entry.RequestedQty);
+
+
+                    });
+                     loadChart();
+
+                } ,
+                error: function () {
+                    alert("Dynamic content load failed.");
+                }
+            });
+        }*/
+
+
+</script>

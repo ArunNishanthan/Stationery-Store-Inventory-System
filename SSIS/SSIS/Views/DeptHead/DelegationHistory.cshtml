@@ -1,0 +1,54 @@
+﻿@model SSIS.View_Models.DelegationHistoryViewModel
+@{
+    ViewBag.Title = "Delegation History";
+    Layout = "~/Views/Shared/Employee/_Layout.cshtml";
+}
+
+<div class="text-center">
+    <h2>Delegation History</h2>
+</div>
+
+@using (Html.BeginForm("GetDelegationHistory", "DeptHead", FormMethod.Post, new { @class = "form-group", id = "form" }))
+{
+    if (Model.Delegations.Count == 0)
+    {
+        <h3> No History to Show</h3>
+    }
+    else
+    {
+        <table class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
+            <thead>
+                <tr>
+                    <th>Delegated To</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (var i = 0; i < Model.Delegations.Count(); i++)
+                {
+                    <tr>
+                        <td>
+                            @Model.Delegations[i].DelegatedTo.UserName
+                        </td>
+                        <td> @Model.Delegations[i].FromDate.GetValueOrDefault().ToString("dd MMM yyyy")</td>
+                        <td>
+                            @Model.Delegations[i].ToDate.GetValueOrDefault().ToString("dd MMM yyyy")
+                        </td>
+                        <td>
+                            @if (Model.Delegations[i].ToDate.GetValueOrDefault() > DateTime.Today)
+                            {
+                                <a href="/deptHead/CancelDelegation/@Model.Delegations[i].Id" class="btn btn-primary">Cancel</a>
+                            }
+                        </td>
+                    </tr>
+
+                }
+
+
+
+        </table>
+
+    }
+}

@@ -1,0 +1,93 @@
+﻿@using SSIS.Enums
+@using SSIS.Models
+@model DepDisbursementList
+
+
+<div class="modal-header">
+    <h5 class="modal-title">Disbursement Items Details</h5>
+    <h5 class="modal-title">@Model.DepDisbursementListNumber</h5>
+    <h5 class="modal-title">
+        @if (Model.DisbursementStatus == DisbursementStatus.WAITING_FOR_ACK)
+        {
+            <span class="bg-info text-white">Waiting for Acknowledgement</span>
+        }
+        else if (Model.DisbursementStatus == DisbursementStatus.WAITING_FOR_OTP)
+        {
+            <span class="bg-warning text-white">Waiting for OTP</span>
+
+        }
+        else if (Model.DisbursementStatus == DisbursementStatus.COLLECTED)
+        {
+            <span class="bg-success text-white">Completed</span>
+
+        }
+        else if (Model.DisbursementStatus == DisbursementStatus.CANCELLED)
+        {
+            <span class="bg-danger text-white">Cancelled</span>
+
+        }
+
+    </h5>
+</div>
+
+<div class="container">
+    @using (Html.BeginForm("AnknowledgeDisbursementItems", "StoreClerk", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+    {
+        <table id="myTable" class="table table-bordered table-head-bg-info table-bordered-bd-info">
+            <thead>
+                <tr>
+
+                    <th>Item Description</th>
+                    <th>Requested Quantity</th>
+                    <th>Retrived Quantity</th>
+                    <th>Disbursed Quantity</th>
+                    @if (Model.DisbursementStatus == SSIS.Enums.DisbursementStatus.WAITING_FOR_ACK)
+                    {
+                        <th>Action</th>
+                    }
+
+
+                </tr>
+            </thead>
+            <tbody>
+                @for (var i = 0; i < Model.DisburseItems.Count; i++)
+                {
+                    @Html.HiddenFor(s => s.DepDisbursementListId, new { @name = "DepDisbursementListId" });
+                    @Html.HiddenFor(t => t.DisburseItems[i].DisburseItemID, new { @name = "DisburseItemID" });
+                    @Html.HiddenFor(v => v.DisburseItems[i].RequestItem.ItemCode, new { @name = "ItemCode" });
+                    <tr>
+
+
+                        <td>@Model.DisburseItems[i].RequestItem.Description</td>
+                        <td>@Model.DisburseItems[i].RequestedQuantity </td>
+                        <td>@Model.DisburseItems[i].RetrivedQuantity</td>
+                        @if (Model.DisbursementStatus == SSIS.Enums.DisbursementStatus.WAITING_FOR_ACK)
+                        {
+                            <td>@Html.TextBoxFor(m => m.DisburseItems[i].DisbursedQuantity, null, new { @type = "number", @min = 0, @max = @Model.DisburseItems[i].RetrivedQuantity, @class = "btn btn-info btn-xs", @name = "DisbursedQuantity" })</td>
+                        }
+                        else
+                        {
+                            <td>@Model.DisburseItems[i].DisbursedQuantity</td>
+                        }
+                        @if (Model.DisbursementStatus == SSIS.Enums.DisbursementStatus.WAITING_FOR_ACK)
+                        {
+                            <td> <button class="btn btn-danger btn-xs" onclick="removeFunction(@Model.DisburseItems[i].DisburseItemID,@Model.DepDisbursementListId)">Remove</button></td>
+                        }
+
+
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+
+        if (Model.DisbursementStatus == SSIS.Enums.DisbursementStatus.WAITING_FOR_ACK)
+        {
+            <input type="submit" class="btn btn-info" value="Acknowledgement" />
+        }
+        <div class="text-center">
+            <button type="button" class="btn btn-secondary m-3" data-dismiss="modal">Close</button>
+
+        </div>
+    }
+</div>

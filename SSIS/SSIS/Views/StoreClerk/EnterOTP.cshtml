@@ -1,0 +1,30 @@
+﻿@using SSIS.Models
+@model DepDisbursementList
+<div class="text-center m-3">
+    <h3>@Model.DepDisbursementListNumber</h3>
+</div>
+
+<div class="container">
+    <div class="form-group">
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">OTP</span>
+            </div>
+            @Html.TextBoxFor(m => m.OTP, null, new { @name = "OTP", @Type = "number", @value = "", @class = "form-control OTP" })
+        </div>
+    </div>
+    <div class="text-center m-3">
+        <button onclick="resentOTPFunction(@Model.DepDisbursementListId)" class="btn btn-default">Resent OTP</button>
+        <button onclick="CheckOTP(@Model.DepDisbursementListId)" class="btn btn-success">Validate</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    </div>
+</div>
+
+<div id='myModal1' class='modal'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent1'></div>
+        </div>
+    </div>
+
+</div>

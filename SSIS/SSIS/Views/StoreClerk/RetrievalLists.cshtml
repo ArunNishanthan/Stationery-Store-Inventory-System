@@ -1,0 +1,83 @@
+﻿@using System.Diagnostics.Eventing.Reader
+@model SSIS.View_Models.RetrievalListViewModel
+@{
+    ViewBag.Title = "RetrievalLists";
+    Layout = "~/Views/Shared/Store/_Layout.cshtml";
+}
+
+<h1 style="text-align: center;">Retrieval Lists</h1>
+
+@if (Model.RetrivalLists.Count != 0)
+{
+
+    using (Html.BeginForm("GenerateDisbursementListbyDept", "StoreClerk", FormMethod.Post))
+    {
+        if (Model.ErrorFlag == true)
+        {
+            <h4 class="text-danger">Can't generate disbursement list!!!! Check the count</h4>
+        }
+
+        @Html.HiddenFor(m => m.RequisationFormsID)
+        <div class="table-responsive">
+            <table class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4" border="1">
+                <thead align="center" class="table-head-bg-primary">
+                    <tr>
+                        <th scope="col" rowspan="2">No</th>
+                        <th scope="col" rowspan="2">Stationery Description</th>
+                        <th scope="col" colspan="2">Total Quantity</th>
+                        <th scope="col" colspan="3">Breakdown by Department</th>
+                    </tr>
+                    <tr>
+                        <th scope="col">Needed</th>
+                        <th scope="col">Retrieved</th>
+                        <th scope="col">Dept</th>
+                        <th scope="col">Needed</th>
+                        <th scope="col">Actual</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (var i = 0; i < Model.RetrivalLists.Count; i++)
+                    {
+                        <tr>
+                            <td scope="row" rowspan="@(Model.RetrivalLists[i].Retrievals.Count + 1)">@(i + 1)</td>
+                            @Html.HiddenFor(m => m.RetrivalLists[i].RetrievedItem.ItemCode)
+                            <td scope="row" rowspan="@(Model.RetrivalLists[i].Retrievals.Count + 1)">@Model.RetrivalLists[i].RetrievedItem.Description</td>
+                            @Html.HiddenFor(m => m.RetrivalLists[i].Needed)
+                            <td scope="row" rowspan="@(Model.RetrivalLists[i].Retrievals.Count + 1)">@Model.RetrivalLists[i].Needed</td>
+                            @Html.HiddenFor(m => m.RetrivalLists[i].Retrieved)
+                            <td scope="row" rowspan="@(Model.RetrivalLists[i].Retrievals.Count + 1)">@Model.RetrivalLists[i].Retrieved</td>
+                            @for (var j = 0; j < Model.RetrivalLists[i].Retrievals.Count; j++)
+                            {
+                            <tr>
+
+                                @Html.HiddenFor(m => m.RetrivalLists[i].Retrievals[j].Department.DepartmentCode)
+                                @Html.HiddenFor(m => m.RetrivalLists[i].Retrievals[j].Needed)
+                                <td scope="row">@Model.RetrivalLists[i].Retrievals[j].Department.DepartmentCode</td>
+                                <td scope="row">@Model.RetrivalLists[i].Retrievals[j].Needed</td>
+                                <td scope="row">@Html.EditorFor(m => m.RetrivalLists[i].Retrievals[j].Actual, new { htmlAttributes = new { @min = "0", @max = Model.RetrivalLists[i].Retrievals[j].Needed > Model.RetrivalLists[i].Retrieved ? Model.RetrivalLists[i].Retrieved : Model.RetrivalLists[i].Retrievals[j].Needed, @class = "form-control" } })</td>
+                                @Html.ValidationMessageFor(m => m.RetrivalLists[i].Retrievals[j].Actual, "", new { @class = "text-danger" })
+                            </tr>
+                        }
+                            </tr>
+                        }
+
+                </tbody>
+            </table>
+        </div>
+        if (Model.RetrivalLists.Count > 0)
+
+        {
+            <div class="text-center">
+                <button type="submit" class="btn btn-outline-primary">Generate Disbursement List</button>
+            </div>
+        }
+    }
+}
+else
+{
+    <p>No more Retrieval Today Enjoy</p>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

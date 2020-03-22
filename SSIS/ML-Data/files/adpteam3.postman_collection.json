@@ -1,0 +1,44 @@
+{
+	"info": {
+		"_postman_id": "2d1124e0-4740-45cf-88d8-17d2d2691569",
+		"name": "adpteam3",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "recommend_quantity",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"recommend_req\" : [\n\t\t{\n\t\t\t\"item_number\" : \"C001\",\n\t\t\t\"year\" : 2020,\n\t\t\t\"month\" : 10\n\t\t},\n\t\t{\n\t\t\t\"item_number\" : \"C001\",\n\t\t\t\"year\" : 2021,\n\t\t\t\"month\" : 1\n\t\t}\n\t]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/recommend_quantity",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"recommend_quantity"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

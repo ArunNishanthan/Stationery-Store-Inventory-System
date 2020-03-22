@@ -1,0 +1,150 @@
+﻿@using SSIS.Enums
+@model SSIS.View_Models.PendingRequestViewModel
+@{
+    ViewBag.Title = "Requests";
+    Layout = "~/Views/Shared/Employee/_Layout.cshtml";
+}
+
+<div class="text-center">
+
+    <h2>Requests</h2>
+</div>
+
+
+
+@if (Model.RequisationForms.Count() != 0)
+{
+    <table id="tableReq" class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
+        <thead>
+            <tr>
+                <th>Request No</th>
+                <th>Requester</th>
+                <th>Requested Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @for (var i = 0; i < Model.RequisationForms.Count(); i++)
+            {
+                <tr>
+                    @Html.HiddenFor(m => m.RequisationForms[i].Id)
+                    <td> <a href="javascript:void(0);" class="anchorDetail" data-id="@Model.RequisationForms[i].Id">@Model.RequisationForms[i].RequestNumber</a> </td>
+
+                    <td>@Model.RequisationForms[i].RequestedBy.UserName</td>
+                    <td>@Model.RequisationForms[i].RequestedDate.GetValueOrDefault().ToShortDateString()</td>
+
+                    <td>
+                        <button value="@Model.RequisationForms[i].Id" class="btn btn-success btn-xs text-white approve" onClick="return approve(this)">Approve</button>
+                        <button value="@Model.RequisationForms[i].Id" class="btn btn-danger btn-xs text-white reject" onClick="return reject(this)">Reject</button>
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+
+    </table>
+}
+else
+{
+    @:There is no more forms to approve
+}
+
+<div id='myModal' class='modal'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script>
+        var TeamDetailPostBackURL = '/Employee/ItemDetailsfromForm';
+        $(function () {
+            $(".anchorDetail").click(function () {
+                var $buttonClicked = $(this);
+                var id = $buttonClicked.attr('data-id');
+                var options = { "backdrop": "static", keyboard: true };
+                $.ajax({
+                    type: "GET",
+                    url: TeamDetailPostBackURL,
+                    contentType: "application/json; charset=utf-8",
+                    data: { "Id": id },
+                    datatype: "json",
+                    success: function (data) {
+                        $('#myModalContent').html(data);
+                        $('#myModal').modal(options);
+                        $('#myModal').modal('show');
+
+                    },
+                    error: function () {
+                        alert("Dynamic content load failed.");
+                    }
+                });
+            });
+
+            $("#closbtn").click(function () {
+                $('#myModal').modal('hide');
+            });
+        });
+
+        $(document).ready(function () {
+            $('#tableReq').DataTable({
+                "order": [[0, "desc"]]
+            });
+        });
+
+
+        function approve(current) {
+
+            var reqId = current.value;
+
+            (async () => {
+
+                const { value: comment } = await Swal.fire({
+                    title: 'Approval',
+                    input: 'text',
+                    inputPlaceholder: 'Enter your Comments (Optional)',
+                    showCancelButton: true,
+                    inputAttributes: {
+                        autocorrect: 'off'
+                    }
+                })
+
+                if (comment != null) {
+                    window.location.href = "ApproveReqForm?comments=" + comment + "&&id=" + reqId;
+                }
+
+            })()
+
+        }
+
+        function reject(current) {
+            var reqId = current.value;
+
+            (async () => {
+
+                const { value: comment } = await Swal.fire({
+                    title: 'Rejection',
+                    input: 'text',
+                    inputPlaceholder: 'Enter your Comments (Optional)',
+                    showCancelButton: true,
+                    inputAttributes: {
+                        autocorrect: 'off'
+                    }
+                })
+
+                if (comment != null) {
+                    window.location.href = "RejectReqForm?comments=" + comment + "&&id=" + reqId;
+                }
+
+            })()
+
+
+        }
+
+    </script>
+}

@@ -1,0 +1,52 @@
+﻿@model SSIS.Models.Item
+@{
+    ViewBag.Title = "Edit Item";
+    Layout = "~/Views/Shared/Store/_Layout.cshtml";
+}
+
+<div class="text-center">
+    <h2>Edit Item</h2>
+</div>
+
+<div class="container">
+    @using (Html.BeginForm("UpdateItem", "StoreClerk", FormMethod.Post))
+    {
+
+        @Html.HiddenFor(m => m.ItemCode)
+        <div class="form-group">
+            @Html.Label("Item Code")
+            @Html.TextBoxFor(m => m.ItemCode, null, new { @class = "form-control", disabled = "true" })
+        </div>
+        <div class="form-group">
+            @Html.Label("Unit Of Measure")
+            @Html.TextBoxFor(m => m.UnitOfMeasure, null, new { @class = "form-control", disabled = "true" })
+        </div>
+        <div class="form-group">
+            @Html.Label("Item Description")
+            @Html.TextBoxFor(m => m.Description, null, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.Description)
+        </div> <div class="form-group">
+            @Html.Label("Reorder Level")
+            @Html.TextBoxFor(m => m.ReorderLevel, null, new { @class = "form-control", value = 1, type = "number" })
+            @Html.ValidationMessageFor(m => m.ReorderLevel)
+        </div>
+        <div class="form-group">
+            @Html.Label("Reorder Quantity")
+            @Html.TextBoxFor(m => m.ReorderQuantity, null, new { @class = "form-control", value = 1, type = "number" })
+            @Html.ValidationMessageFor(m => m.ReorderQuantity)
+        </div>
+
+        <div class="form-group">
+            &nbsp; &nbsp; &nbsp; &nbsp;   @Html.CheckBoxFor(m => m.IsActive, new { @class = "form-check-input" })
+            <label class="form-check-label"> Is Active?</label>
+        </div>
+        <br />
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary btn-sm">Submit</button>
+        </div>
+
+    }
+</div>
+@section scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+}

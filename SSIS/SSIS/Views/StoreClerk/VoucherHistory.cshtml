@@ -1,0 +1,85 @@
+﻿@model SSIS.View_Models.AdjustmentVoucherViewModel
+@{
+    ViewBag.Title = "Voucher History";
+    Layout = "~/Views/Shared/Store/_Layout.cshtml";
+}
+
+<h2 align="center">Voucher History</h2>
+@if (Model.adjustmentVoucherLists.Count != 0)
+{
+    <table id="tableReq" class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
+        <thead>
+            <tr>
+                <th>Voucher No</th>
+                <th>Requested Date</th>
+                <th>Requested By</th>
+                <th>Issued Date</th>
+                <th>Issued By</th>
+                <th>Voucher Value</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (var i = 0; i < Model.adjustmentVoucherLists.Count(); i++)
+            {
+                <tr>
+                    <td> @Model.adjustmentVoucherLists[i].voucher.VoucherNumber</td>
+                    <td>@Model.adjustmentVoucherLists[i].voucher.RequestedDate.ToShortDateString()</td>
+                    <td>@Model.adjustmentVoucherLists[i].voucher.RequestedBy.UserName</td>
+                    <td>@Model.adjustmentVoucherLists[i].voucher.IssuedDate.ToShortDateString()</td>
+                    <td>@Model.adjustmentVoucherLists[i].voucher.IssuedBy.UserName</td>
+                    <td>@Model.adjustmentVoucherLists[i].price</td>
+                    <td>@Model.adjustmentVoucherLists[i].voucher.VoucherStatus</td>
+                    <td><a href="javascript:void(0);" class="btn btn-primary btn-xs anchorDetail" data-id="@Model.adjustmentVoucherLists[i].voucher.VoucherId">View</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    @:<h4>There is no voucher history. </h4>
+}
+
+<div id='myModal' class='modal'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+
+</div>
+
+@section scripts
+    {
+    <script>
+        var TeamDetailPostBackURL = '/StoreClerk/VoucherDetail';
+        $(function () {
+            $(".anchorDetail").click(function () {
+                var $buttonClicked = $(this);
+                var id = $buttonClicked.attr('data-id');
+                var options = { "backdrop": "static", keyboard: true };
+                $.ajax({
+                    type: "GET",
+                    url: TeamDetailPostBackURL,
+                    contentType: "application/json; charset=utf-8",
+                    data: { "Id": id },
+                    datatype: "json",
+                    success: function (data) {
+                        $('#myModalContent').html(data);
+                        $('#myModal').modal(options);
+                        $('#myModal').modal('show');
+                    },
+                    error: function () {
+                        alert("Dynamic content load failed.");
+                    }
+                });
+            });
+            $("#closbtn").click(function () {
+                $('#myModal').modal('hide');
+            });
+        });
+
+    </script>
+}

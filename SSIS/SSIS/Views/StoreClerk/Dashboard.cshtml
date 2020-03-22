@@ -1,0 +1,94 @@
+﻿@using SSIS.Enums
+@using SSIS.Models
+@model SSIS.View_Models.StoreDashboardViewModel
+@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/Store/_Layout.cshtml";
+    User user = (User)Session["usersession"];
+}
+
+<div class="container text-center">
+    <h2>Dashboard</h2>
+    <br />
+    <br />
+    <div class="row">
+        <div class="col-sm-6 col-md-3">
+            <div class="card card-stats card-primary card-round">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-5">
+                            <div class="icon-big text-center">
+                                <i class="icon-briefcase"></i>
+                            </div>
+                        </div>
+                        <div class="col-7 col-stats">
+                            <div class="numbers">
+                                <p class="card-category">Pending<br />Disbursement</p>
+                                <h4 class="card-title">@Model.disbursementlist</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-3">
+            <div class="card card-stats card-info card-round">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-5">
+                            <div class="icon-big text-center">
+                                <i class="flaticon-interface-6"></i>
+                            </div>
+                        </div>
+                        <div class="col-7 col-stats">
+                            <div class="numbers">
+                                <p class="card-category">Pending<br />Retrivals</p>
+                                <h4 class="card-title">@Model.retrievalList</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-3">
+            <div class="card card-stats card-success card-round">
+                <div class="card-body ">
+                    <div class="row">
+                        <div class="col-5">
+                            <div class="icon-big text-center">
+                                <i class="icon-social-dropbox"></i>
+                            </div>
+                        </div>
+                        <div class="col-7 col-stats">
+                            <div class="numbers">
+                                <p class="card-category">Pending<br />PO Delivery</p>
+                                <h4 class="card-title">@Model.pODelivery</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-6 col-md-3">
+            <div class="card card-stats card-secondary card-round">
+                <div class="card-body ">
+                    <div class="row">
+                        <div class="col-5">
+                            <div class="icon-big text-center">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                        </div>
+                        <div class="col-7 col-stats">
+                            <div class="numbers">
+                                <p class="card-category">Low Stock <br>Items</p>
+                                <h4 class="card-title">@Model.lowStockItemCount</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

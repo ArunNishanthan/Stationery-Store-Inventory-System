@@ -1,0 +1,59 @@
+﻿@using SSIS.Enums
+@using SSIS.Models
+@model SSIS.View_Models.EmplyeeDashboardViewModel
+
+@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/Employee/_Layout.cshtml";
+    User user = (User)Session["usersession"];
+}
+<div class="container text-center">
+    <h2>Dashboard</h2>
+    <br />
+    <br />
+    <div class="row">
+        @if (user.Role != Role.DEPT_REP)
+        {
+            <div class="col-sm-6 col-md-3">
+                <div class="card card-stats card-primary card-round">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-5">
+                                <div class="icon-big text-center">
+                                    <i class="icon-briefcase"></i>
+                                </div>
+                            </div>
+
+                            <div class="col-7 col-stats">
+                                <div class="numbers">
+                                    <p class="card-category">Pending<br />Approval</p>
+                                    <h4 class="card-title">@Model.pendingapproval</h4>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        <div class="col-sm-6 col-md-3">
+            <div class="card card-stats card-info card-round">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-5">
+                            <div class="icon-big text-center">
+                                <i class="flaticon-interface-6"></i>
+                            </div>
+                        </div>
+                        <div class="col-7 col-stats">
+                            <div class="numbers">
+                                <p class="card-category">Pending<br />Disbursements</p>
+                                <h4 class="card-title">@Model.pendingdisbursements</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,63 @@
+﻿@using SSIS.Models
+@model LoginViewModel
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/Account/_Layout.cshtml";
+}
+
+<style>
+
+    .validation-summary-errors {
+        color: red;
+    }
+
+    .input-validation-error {
+        border: red solid 2px;
+    }
+
+    .form-control:focus {
+        border-color: #FF0000;
+        box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(255, 0, 0, 0.6);
+    }
+</style>
+<div class="limiter">
+    <div class="container-login100">
+        <div class="wrap-login100">
+            <div class="login100-form-title" style="background-image: url(/Content/bg-01.jpg);
+    ">
+                <span class="login100-form-title-1">
+                    Logic University
+                </span>
+            </div>
+
+            @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "login100-form validate-form", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <label>Email</label>
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+
+                </div>
+                @Html.ValidationSummary(true)
+                <div class="container-login100-form-btn">
+                    <button class="login100-form-btn btn-primary" type="submit">
+                        Login
+                    </button>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

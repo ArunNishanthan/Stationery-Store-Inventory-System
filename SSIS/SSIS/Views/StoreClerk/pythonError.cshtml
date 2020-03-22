@@ -1,0 +1,15 @@
+﻿@using SSIS.Enums
+@using SSIS.Models
+@model SSIS.View_Models.StoreDashboardViewModel
+@{
+    ViewBag.Title = "Error";
+    Layout = "~/Views/Shared/Store/_Layout.cshtml";
+    User user = (User)Session["usersession"];
+}
+
+<div class="container text-center">
+
+    <br />
+    <br />
+    Run the Python Script for Analysis
+</div>

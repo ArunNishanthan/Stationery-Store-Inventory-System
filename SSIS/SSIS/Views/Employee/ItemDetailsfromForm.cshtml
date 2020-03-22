@@ -1,0 +1,35 @@
+﻿@model SSIS.Models.RequisationForm
+
+
+<div class="modal-header text-center">
+    <h5 class="modal-title"> @Model.RequestNumber</h5>
+</div>
+
+<hr />
+
+<div class="container">
+    <table class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Quantity</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @for (var i = 0; i < Model.RequestItems.Count; i++)
+            {
+                <tr>
+                    <td>@Model.RequestItems[i].Item.Category</td>
+                    <td>@Model.RequestItems[i].Item.Description</td>
+                    <td>@Model.RequestItems[i].Quantity</td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+</div>

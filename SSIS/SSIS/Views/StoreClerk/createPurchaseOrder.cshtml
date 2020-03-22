@@ -1,0 +1,130 @@
+﻿@model SSIS.View_Models.SystemGeneratePurchaseOrderViewModel
+@{
+    ViewBag.Title = "Purchase Order";
+    Layout = "~/Views/Shared/Store/_Layout.cshtml";
+    var count = (int)ViewData["count"];
+}
+
+@using (Html.BeginForm("checkReqList", "StoreClerk", FormMethod.Post, new { id = "form", @class = "form-group" }))
+{
+    <div class="text-center container">
+        <h2>Purchase Order</h2>
+        <br />
+        <select class="itemSearch" style="min-width: 400px">
+        </select>
+        @Html.HiddenFor(m => m.RequestCode)
+        @Html.HiddenFor(m => m.DeleteCode)
+        <input id="btnAdd" type="submit" class="btn btn-primary btn-xs" value="Add">
+        <a href="/StoreClerk/systemGeneratePurchaseOrder" class="btn btn-outline-primary btn-sm">Auto generate for Low Stock Items</a>
+    </div>
+    <br />
+    if (Model.PurchaseOrderQuantityList.Count != 0)
+    {
+        <table class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
+            <thead>
+            <th>Action</th>
+            <th>Item Description</th>
+            <th>Reorder Level</th>
+            <th>Reorder Quantity</th>
+            <th>Current Quantity</th>
+            <th>Unit of Measure</th>
+            <th>Supplier</th>
+            <th>Order Quantity</th>
+            <th>Price</th>
+            </thead>
+            @for (var i = 0; i < count; i++)
+            {
+                <tr>
+                    <td rowspan="4"> <button value="@Model.PurchaseOrderQuantityList[i * 3].itemSupplier.Item.ItemCode" class="btn btn-danger btn-xs remove">X</button></td>
+                    <td rowspan="4">@Model.PurchaseOrderQuantityList[i * 3].itemSupplier.Item.Description</td>
+                    <td rowspan="4">@Model.PurchaseOrderQuantityList[i * 3].itemSupplier.Item.ReorderLevel</td>
+                    <td rowspan="4">@Model.PurchaseOrderQuantityList[i * 3].itemSupplier.Item.ReorderQuantity</td>
+                    <td rowspan="4">@Model.PurchaseOrderQuantityList[i * 3].itemSupplier.Item.CurrentQuantity</td>
+                    <td rowspan="4">@Model.PurchaseOrderQuantityList[i * 3].itemSupplier.Item.UnitOfMeasure</td>
+
+                    @for (var k = 0; k < Model.PurchaseOrderQuantityList.Count / count; k++)
+                    {
+                    <tr>
+                        @Html.HiddenFor(m => @Model.PurchaseOrderQuantityList[k + (i * 3)].itemSupplier.ItemSupplierId, new { @name = "ItemCode" })
+                        @Html.HiddenFor(m => @Model.PurchaseOrderQuantityList[k + (i * 3)].itemSupplier.Item.ItemCode, new { @name = "ItemCode" })
+                        @Html.HiddenFor(m => @Model.PurchaseOrderQuantityList[k + (i * 3)].itemSupplier.Supplier.SupplierCode, new { @name = "SupplierCode" })
+                        <td>@Model.PurchaseOrderQuantityList[k + (i * 3)].itemSupplier.Supplier.SupplierName</td>
+                        <td>
+                            @Html.TextBoxFor(m => m.PurchaseOrderQuantityList[k + (i * 3)].Quantity, new { @type = "number", @min = "0", @step = "1", value = 0 })
+                        </td>
+                        <td>@Model.PurchaseOrderQuantityList[k + (i * 3)].itemSupplier.Price</td>
+                    </tr>
+                }
+                    </tr>
+                }
+
+        </table>
+        <div class="text-center">
+            <input type="submit" id="clear" class="btn btn-primary" value="Submit" />
+
+        </div>
+    }
+}
+
+
+@section scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/select")
+
+    <script>
+        $('.itemSearch').select2({
+            placeholder: 'Type to Search the Item',
+            ajax: {
+                url: '/api/Item/SearchItemsforPO',
+                dataType: 'json',
+                data: function (params) {
+                    var query = {
+                        value: params.term
+                    }
+                    return query;
+                },
+
+                processResults: function (data) {
+                    var items = [];
+                    data.forEach(element => {
+                        var d = { id: element.ItemCode, text: element.Description };
+                        items.push(d);
+                    });
+                    return {
+                        results: items
+                    };
+                }
+            }
+        });
+
+        var RequestCode = document.getElementById("RequestCode");
+        var DeleteCode = document.getElementById("DeleteCode");
+        var classname = document.getElementsByClassName("remove");
+
+        RequestCode.value = "";
+        DeleteCode.value = "";
+
+        var sub = document.getElementById("btnAdd");
+
+        sub.addEventListener("click", function (e) {
+            RequestCode.value = $('.itemSearch').val();
+
+            var form = document.getElementById("form");
+
+            form.submit();
+            e.preventDefault();
+        });
+
+        var myFunction = function (e) {
+            DeleteCode.value = e.target.value;
+            var form = document.getElementById("form");
+            form.submit();
+            e.preventDefault();
+        };
+
+        for (var i = 0; i < classname.length; i++) {
+            classname[i].addEventListener('click', myFunction, false);
+        }
+        RequestCode.value = "";
+        DeleteCode.value = "";</script>
+}

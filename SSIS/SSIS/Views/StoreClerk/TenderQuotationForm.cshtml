@@ -1,0 +1,55 @@
+﻿@model SSIS.View_Models.ItemSupplierListViewModel
+@{
+    ViewBag.Title = "Tender List";
+    Layout = "~/Views/Shared/Store/_Layout.cshtml";
+}
+
+<div class="text-center">
+    <h2>Tender List</h2>
+</div>
+
+
+@using (Html.BeginForm("GetItemListBySupplier", "StoreClerk", FormMethod.Post))
+{
+    @Html.DropDownListFor(m => m.SelectedSupplierCode, new SelectList(Model.Suppliers, "SupplierCode", "SupplierName"),
+    "Select the Supplier", new { @class = "form-control" })
+    <br />
+    <div class="text-center">
+        <button type="Submit" class="btn btn-success btn-sm">Submit</button>
+    </div>
+
+}
+
+@if (Model.itemSuppliers != null && Model.SelectedSupplierCode != null)
+{
+    if (Model.itemSuppliers.Count > 0)
+    {
+        <div class="container">
+            <table id="tableReq" class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
+                <thead>
+                    <tr>
+                        <th>Item Code</th>
+                        <th>Item Description</th>
+                        <th>Tender Price</th>
+                        <th>Unit of Measure</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (var i = 0; i < Model.itemSuppliers.Count; i++)
+                    {
+                        <tr>
+                            <td>@Model.itemSuppliers[i].Item.ItemCode</td>
+                            <td>@Model.itemSuppliers[i].Item.Description</td>
+                            <td>@Model.itemSuppliers[i].Price</td>
+                            <td>@Model.itemSuppliers[i].Item.UnitOfMeasure</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        @:There is no items to show
+    }
+}

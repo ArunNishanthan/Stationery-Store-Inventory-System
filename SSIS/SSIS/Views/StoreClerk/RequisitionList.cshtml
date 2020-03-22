@@ -1,0 +1,90 @@
+﻿@model SSIS.View_Models.RequisitionListViewModel
+@{
+    ViewBag.Title = "Requisition List";
+    Layout = "~/Views/Shared/Store/_Layout.cshtml";
+}
+
+<div class="text-center container">
+    <h2>Requisition List</h2>
+</div>
+
+@if (Model.RequisitionLists.Count != 0)
+{
+
+    <table class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
+        <thead>
+            <tr>
+                <th>Serial No</th>
+                <th>Department Name</th>
+                <th>Department Representative</th>
+                <th>Last Updated</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @for (var i = 0; i < Model.RequisitionLists.Count(); i++)
+            {
+                <tr>
+                    <td>@(i + 1)</td>
+                    <td>@Model.RequisitionLists[i].Department.DepartmentName</td>
+                    <td>
+                        @Model.RequisitionLists[i].Department.DepartmentRepresentative.UserName
+                    </td>
+                    <td>@Model.RequisitionLists[i].LastUpdated.Value.ToLongDateString()</td>
+                    <td>
+                        <a href="javascript:void(0);" class="anchorDetail btn btn-info btn-sm" data-id="@Model.RequisitionLists[i].Department.DepartmentCode">View</a>
+                        <a href="/StoreClerk/ChangeStatusToRetrivalByDep?depCode=@Model.RequisitionLists[i].Department.DepartmentCode" class="btn btn-success btn-sm">Add</a>
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No more Requisition Forms</p>
+}
+
+<div id='myModal' class='modal'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+
+</div>
+
+@section scripts{
+    <script>
+        var TeamDetailPostBackURL = '/StoreClerk/ItemDetailsbyDep';
+        $(function () {
+            $(".anchorDetail").click(function () {
+                var $buttonClicked = $(this);
+                var id = $buttonClicked.attr('data-id');
+                var options = { "backdrop": "static", keyboard: true };
+                $.ajax({
+                    type: "GET",
+                    url: TeamDetailPostBackURL,
+                    contentType: "application/json; charset=utf-8",
+                    data: { "Id": id },
+                    datatype: "json",
+                    success: function (data) {
+                        $('#myModalContent').html(data);
+                        $('#myModal').modal(options);
+                        $('#myModal').modal('show');
+
+                    },
+                    error: function () {
+                        alert("Dynamic content load failed.");
+                    }
+                });
+            });
+
+            $("#closbtn").click(function () {
+                $('#myModal').modal('hide');
+            });
+        });
+    </script>
+}

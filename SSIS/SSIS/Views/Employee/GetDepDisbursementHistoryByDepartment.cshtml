@@ -1,0 +1,112 @@
+﻿@using SSIS.Enums
+@using SSIS.Models
+@model List<DepDisbursementList>
+@{
+    ViewBag.Title = "Disbursement History";
+    Layout = "~/Views/Shared/Employee/_Layout.cshtml";
+
+    User user = (User)Session["usersession"];
+}
+
+<div class="text-center">
+    <h2>Disbursement History</h2>
+</div>
+
+@if (Model.Count != 0)
+{
+    <table id="tableReq" class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
+        <thead>
+            <tr>
+                <th>Disbursement No</th>
+                <th>Department Name</th>
+                <th>Department Representative</th>
+                <th>Collection Point</th>
+                <th>Disbursement Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (DepDisbursementList dep in @Model)
+            {
+                if (dep.DisburseItems.Count > 0)
+                {
+
+                    <tr>
+                        <td>
+                            <button onClick="callPopUp(@dep.DepDisbursementListId);" class="btn-link">@dep.DepDisbursementListNumber</button>
+                        </td>
+                        <td>@dep.Department.DepartmentName </td>
+                        <td>@dep.Department.DepartmentRepresentative.UserName </td>
+                        <td>@dep.Department.CollectionPoint.Place</td>
+                        <td>@dep.DisburseDate.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            @if (dep.DisbursementStatus == DisbursementStatus.WAITING_FOR_OTP)
+                            {
+                                @:Waiting for OTP
+                            }
+                            else if (dep.DisbursementStatus == DisbursementStatus.WAITING_FOR_ACK)
+                            {
+                                @:Waiting for Acknowledgment
+                            }
+                            else if (dep.DisbursementStatus == DisbursementStatus.COLLECTED)
+                            {
+                                @:Collected
+                            }
+                            else if (dep.DisbursementStatus == DisbursementStatus.CANCELLED)
+                            {
+                                @:Cancelled
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No History Available</p>
+}
+
+<div id='myModal' class='modal'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+
+</div>
+
+@section scripts{
+    <script>
+        var TeamDetailPostBackURL = '/Employee/GetDisbursementDetailsByDepartment';
+        function callPopUp(id) {
+            var options = { "backdrop": "static", keyboard: true };
+            $.ajax({
+                type: "GET",
+                url: TeamDetailPostBackURL,
+                contentType: "application/json; charset=utf-8",
+                data: { "Id": id },
+                datatype: "json",
+                success: function (data) {
+                    $('#myModalContent').html(data);
+                    $('#myModal').modal(options);
+                    $('#myModal').modal('show');
+
+                },
+                error: function () {
+                    alert("Dynamic content load failed.");
+                }
+            });
+        }
+        $("#closbtn").click(function () {
+            $('#myModal').modal('hide');
+        });
+
+        $(document).ready(function () {
+            $('#tableReq').DataTable({
+                "order": [[0, "desc"]]
+            });
+        });
+    </script>
+}

@@ -1,0 +1,236 @@
+﻿@using SSIS.Models
+@model List<DepDisbursementList>
+
+
+@{
+    ViewBag.Title = "Disbursement List";
+    Layout = "~/Views/Shared/Store/_Layout.cshtml";
+}
+
+<div class="text-center">
+    <h2>Disbursement List</h2>
+</div>
+@if (Model.Count != 0)
+{
+    <table id="tableDeptDisburse" class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
+        <thead>
+            <tr>
+                <th>Disbursement No</th>
+                <th>Department Name</th>
+                <th>Department Representative</th>
+                <th>Collection Point</th>
+                <th>Confirmation</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (DepDisbursementList dep in Model)
+            {
+                <tr>
+                    <td>@dep.DepDisbursementListNumber</td>
+
+                    <td>@dep.Department.DepartmentName </td>
+                    <td>@dep.Department.DepartmentRepresentative.UserName </td>
+                    <td>@dep.Department.CollectionPoint.Place</td>
+
+                    <td>
+                        @if (dep.DisbursementStatus == SSIS.Enums.DisbursementStatus.WAITING_FOR_ACK)
+                        {
+                            @Html.ActionLink("Cancel", "CancelDisbursementList", "StoreClerk", new { Id = @dep.DepDisbursementListId }, new { @class = "btn btn-danger btn-xs remove" })
+                        }
+
+                        @if (dep.DisbursementStatus != SSIS.Enums.DisbursementStatus.COLLECTED && dep.DisbursementStatus != SSIS.Enums.DisbursementStatus.WAITING_FOR_ACK && dep.DisbursementStatus != SSIS.Enums.DisbursementStatus.CANCELLED)
+                        {
+                            <button onClick="enterOTPFunction(@dep.DepDisbursementListId);return false;" id="btnOTP" class="btn btn-success btn-xs">Enter OTP</button>
+                        }
+
+                        @if (dep.DisbursementStatus == SSIS.Enums.DisbursementStatus.WAITING_FOR_ACK)
+                        {
+                            <button onClick="callPopUp(@dep.DepDisbursementListId);" class="btn btn-info btn-xs" data-id="@dep.DepDisbursementListId">Acknowledge</button>
+                        }
+                        else
+                        {
+                            <button onClick="callPopUp(@dep.DepDisbursementListId);" class="btn btn-info btn-xs">View</button>
+                        }
+
+                        @for (var i = 0; i < dep.DisburseItems.Count; i++)
+                        {
+                            if (dep.DisburseItems[i].DisbursedQuantity < dep.DisburseItems[i].RequestedQuantity && dep.DisbursementStatus != SSIS.Enums.DisbursementStatus.WAITING_FOR_ACK && dep.isGenerated != true && dep.DisbursementStatus != SSIS.Enums.DisbursementStatus.CANCELLED)
+                            {
+                                <button onclick="generateRequest(@dep.DepDisbursementListId);return false;" id="btnRequest" class="btn btn-warning btn-xs" data-id="@dep.DepDisbursementListId">Generate</button>
+                                break;
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    @:There is nothing to show here
+}
+<div id='myModal' class='modal'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+
+</div>
+
+@section scripts{
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9">
+    </script>
+    <script>
+
+        $(document).ready(function () {
+            $('#tableDeptDisburse').DataTable();
+        });
+        function callPopUp(id) {
+            var options = { "backdrop": "static", keyboard: true };
+            $.ajax({
+                type: "GET",
+                url: '/StoreClerk/Details',
+                contentType: "application/json; charset=utf-8",
+                data: { "Id": id },
+                datatype: "json",
+                success: function (data) {
+                    $('#myModalContent').html(data);
+                    $('#myModal').modal(options);
+                    $('#myModal').modal('show');
+
+                },
+                error: function () {
+                    alert("Dynamic content load failed.");
+                }
+            });
+        }
+
+        $("#closbtn").click(function () {
+            $('#myModal').modal('hide');
+        });
+
+        function generateRequest(id) {
+            $.ajax({
+                type: "GET",
+                url: "/StoreClerk/GenerateRequisation",
+                contentType: "application/json; charset=utf-8",
+                data: { "Id": id },
+                datatype: "json",
+                success: function () {
+                    Swal.fire({
+                        title: 'New Requisition Created!',
+                        icon: 'Success',
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'Great'
+                    }).then((result) => {
+                        if (result.value) {
+                            location.reload(true);
+                        }
+                    }
+                    )
+                }
+            })
+        }
+
+
+        function removeFunction(id, depId) {
+            event.preventDefault();
+            $.ajax({
+                url: "/StoreClerk/RemoveDisbursementItem",
+                contentType: "application/json; charset=utf-8",
+                data: {
+                    "Id": id,
+                    "DepId": depId
+                },
+                datatype: "json",
+                success: function () {
+                    Swal.fire(
+                        'Item Removed',
+                        '',
+                        'warning'
+                    );
+                }
+            });
+
+            event.target.parentElement.parentElement.remove();
+            var rowCount = $('#myTable >tbody >tr').length;
+            if (rowCount == 0) {
+                $('#myModal').modal('hide');
+                location.reload(true);
+            }
+        }
+
+        function enterOTPFunction(id) {
+            var options = { "backdrop": "static", keyboard: true };
+            $.ajax({
+                type: "GET",
+                url: '/StoreClerk/EnterOTP',
+                contentType: "application/json; charset=utf-8",
+                data: { "Id": id },
+                datatype: "json",
+                success: function (data) {
+                    $('#myModalContent').html(data);
+                    $('#myModal').modal(options);
+                    $('#myModal').modal('show');
+
+                },
+                error: function () {
+                    alert("Dynamic content load failed.");
+                }
+            });
+        }
+
+        function resentOTPFunction(id) {
+            event.preventDefault();
+            $.ajax({
+                type: "GET",
+                url: "/StoreClerk/ResentOTP",
+                contentType: "application/json; charset=utf-8",
+                data: { "Id": id },
+                datatype: "json",
+                success: function (data) {
+                    Swal.fire(
+                        'Code Resent',
+                        '',
+                        'success'
+                    )
+                }
+
+            });
+        }
+
+        function CheckOTP(Id) {
+            event.preventDefault();
+
+            var input = $('.OTP').val();
+            if (input == "") {
+                input = 0
+            }
+            $.ajax({
+                type: "GET",
+                url: "/StoreClerk/CheckOTP",
+                contentType: "application/json; charset=utf-8",
+                data: { "Id": Id, "OTP": input },
+                datatype: "json",
+                success: function (data) {
+                    if (data == "True") {
+                        Swal.fire(
+                            'OTP Validation is Done',
+                            '',
+                            'success'
+                        );
+                        setTimeout(function () {
+                            window.location.href = "/StoreClerk/ValidateOTP?Id=" + Id; // The URL that will be redirected too.
+                        }, 1000);
+                    } else {
+                        $(".form-group").addClass("has-error");
+                    }
+                }
+            });
+        }
+
+    </script>
+}

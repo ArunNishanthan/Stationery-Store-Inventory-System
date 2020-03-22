@@ -1,0 +1,50 @@
+﻿@model  SSIS.View_Models.VoucherListToGenerateViewModel
+@{
+    ViewBag.Title = "GenerateVoucher";
+    Layout = "~/Views/Shared/Store/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
+
+<h1 style="text-align: center;">Generate Voucher</h1>
+@using (Html.BeginForm("CreateVouchers", "StoreClerk"))
+{
+    <div class="table-responsive">
+        @if (Model.voucherList.Count != 0)
+        {
+            <table id="tableReq" class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Item Description</th>
+                        <th>Quantity</th>
+                        <th>Created Date</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (var i = 0; i < Model.voucherList.Count(); i++)
+                    {
+                        <tr>
+                            <td>@(i + 1)</td>
+                            <td>@Model.voucherList[i].Item.Description</td>
+                            <td>@Model.voucherList[i].Quantity</td>
+                            <td>@Model.voucherList[i].CreatedDate.ToShortDateString()</td>
+                            <td>@Model.voucherList[i].Comment</td>
+                            <td>Active</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div class="text-center">
+                <button type="submit" class="btn btn-outline-primary" align="center">Generate Adjustment Voucher</button>
+            </div>
+        }
+        else
+        {
+            @:<h4>There is no voucher to generate.</h4>
+        }
+
+    </div>
+}

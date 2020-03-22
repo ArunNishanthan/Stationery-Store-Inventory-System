@@ -1,0 +1,60 @@
+﻿@model SSIS.View_Models.ItemViewModel
+@{
+    ViewBag.Title = "Catalogue";
+    Layout = "~/Views/Shared/Employee/_Layout.cshtml";
+}
+
+<div class="text-center">
+    <h2>Catalogue</h2>
+</div>
+
+
+@if (Model.ItemList.Count() != 0)
+{
+    <table id="tableReq" class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
+        <thead>
+            <tr>
+                <th>Item Code</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Unit of Measure</th>
+
+            </tr>
+        </thead>
+        <tbody>
+
+            @for (var i = 0; i < Model.ItemList.Count(); i++)
+            {
+                <tr>
+                    <td>@Model.ItemList[i].ItemCode </td>
+                    <td>@Model.ItemList[i].Category</td>
+                    <td>@Model.ItemList[i].Description</td>
+                    <td>@Model.ItemList[i].UnitOfMeasure</td>
+
+
+                </tr>
+            }
+        </tbody>
+
+    </table>
+}
+else
+{
+    @:There is no item to show
+}
+
+
+
+
+@section scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script>
+        $(document).ready(function () {
+            $('#tableReq').DataTable({
+                responsive: true
+            });
+        });
+
+    </script>
+}

@@ -1,0 +1,40 @@
+﻿@model SSIS.Models.Voucher
+@{
+    ViewBag.Title = "Create Voucher";
+    Layout = "~/Views/Shared/Store/_Layout.cshtml";
+}
+
+<div class="text-center">
+    <h2>Create Voucher</h2>
+</div>
+
+<div class="form-group">
+    @using (Html.BeginForm("CheckVoucher", "StoreClerk", FormMethod.Post))
+    {
+
+        @Html.HiddenFor(m => m.Item.ItemCode)
+        @Html.Label("Item Code")
+        @Html.TextBoxFor(m => m.Item.ItemCode, null, new { @class = "form-control", disabled = "true" })
+        <br />
+        @Html.Label("Item Description")
+        @Html.TextBoxFor(m => m.Item.Description, null, new { @class = "form-control", disabled = "true" })
+        <br />
+        @Html.Label("Quantity")
+        @Html.TextBoxFor(m => m.Quantity, null, new { @class = "form-control", value = 1, min = @Model.Item.CurrentQuantity * -1, type = "number" })
+        @Html.ValidationMessageFor(m => m.Quantity)
+        <br />
+        @Html.Label("Comment")
+        @Html.TextBoxFor(m => m.Comment, null, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Comment)
+        <br />
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+
+    }
+</div>
+<br>
+@section scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+}

@@ -1,0 +1,112 @@
+﻿@model SSIS.View_Models.RequisitionViewModel
+@{
+    ViewBag.Title = "Request Form";
+    Layout = "~/Views/Shared/Employee/_Layout.cshtml";
+}
+
+
+@using (Html.BeginForm("checkReqList", "Employee", FormMethod.Post, new { id = "form", @class = "form-group" }))
+{
+    <div class="text-center container">
+        <h2>Request Form</h2>
+        <select class="itemSearch" style="min-width: 400px">
+        </select>
+        @Html.HiddenFor(m => m.RequestCode)
+        @Html.HiddenFor(m => m.DeleteCode)
+        <input id="btnAdd" type="submit" class="btn btn-primary btn-xs" value="Add">
+    </div>
+    if (Model.RequestItems.Count != 0)
+    {
+        @Html.HiddenFor(m => m.RequisationFormID)
+        <table class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
+            <thead>
+                <tr>
+                    <th>S No</th>
+                    <th>Description</th>
+                    <th>Quantity</th>
+                    <th>Unit of Measure</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (var i = 0; i < Model.RequestItems.Count(); i++)
+                {
+                    <tr>
+                        <td>@(i + 1)</td>
+                        @Html.HiddenFor(m => m.RequestItems[i].Item.ItemCode)
+                        <td>@Model.RequestItems[i].Item.Description</td>
+                        <td>
+                            @Html.TextBoxFor(m => m.RequestItems[i].Quantity, null, new { type = "number", @class = "form-control form-control-sm" })
+                        </td>
+                        <td>@Model.RequestItems[i].Item.UnitOfMeasure</td>
+                        <td><button value="@Model.RequestItems[i].Item.ItemCode" class="btn btn-danger btn-xs remove">Remove</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        @Html.AntiForgeryToken()
+        <input type="submit" id="clear" class="btn btn-primary" value="Submit" />
+    }
+}
+
+
+@section scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $('.itemSearch').select2({
+            placeholder: 'Type to Search the Item',
+            ajax: {
+                url: '/api/Item/SearchItems',
+                dataType: 'json',
+                data: function (params) {
+                    var query = {
+                        value: params.term
+                    }
+                    return query;
+                },
+
+                processResults: function (data) {
+                    var items = [];
+                    data.forEach(element => {
+                        var d = { id: element.ItemCode, text: element.Description };
+                        items.push(d);
+                    });
+                    return {
+                        results: items
+                    };
+                }
+            }
+        });
+
+        var RequestCode = document.getElementById("RequestCode");
+        var DeleteCode = document.getElementById("DeleteCode");
+        var classname = document.getElementsByClassName("remove");
+
+        RequestCode.value = "";
+        DeleteCode.value = "";
+
+        var sub = document.getElementById("btnAdd");
+
+        sub.addEventListener("click", function (e) {
+            RequestCode.value = $('.itemSearch').val();
+
+            var form = document.getElementById("form");
+
+            form.submit();
+            e.preventDefault();
+        });
+
+        var myFunction = function (e) {
+            DeleteCode.value = e.target.value;
+            var form = document.getElementById("form");
+            form.submit();
+            e.preventDefault();
+        };
+
+        for (var i = 0; i < classname.length; i++) {
+            classname[i].addEventListener('click', myFunction, false);
+        }
+        RequestCode.value = "";
+        DeleteCode.value = "";
+    </script>
+}

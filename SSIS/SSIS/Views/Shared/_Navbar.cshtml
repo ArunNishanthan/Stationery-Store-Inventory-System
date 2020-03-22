@@ -1,0 +1,56 @@
+﻿@using SSIS.Enums
+@using SSIS.Models
+@{
+    User user = (User)Session["usersession"];
+}
+
+<nav class="navbar navbar-header navbar-expand-lg" data-background-color="blue2">
+    <div class="container-fluid">
+        <ul class="navbar-nav topbar-nav ml-md-auto align-items-center">
+
+            <li class="nav-item dropdown hidden-caret">
+            </li>
+            <li class="nav-item dropdown hidden-caret">
+                <div class="dropdown-toggle profile-pic" data-toggle="dropdown" href="#" aria-expanded="false">
+
+                    <div class="avatar avatar-online">
+                        <span class="avatar-title rounded-circle text-white">@user.UserName[0].ToString().ToUpper()</span>
+                    </div>
+
+                </div>
+            </li>
+            <li class="nav-item dropdown hidden-caret text-white d-sm-none d-md-block">
+                @user.UserName<br />
+                @if (user.Role == Role.DEPT_HEAD)
+                {
+                    <span class="text-white">Department Head</span>
+                }
+                else if (user.Role == Role.DEPT_ACT_HEAD)
+                {
+                    <span class="text-white">Acting Department Head</span>
+                }
+                else if (user.Role == Role.DEPT_REP)
+                {
+                    <span class="text-white">Department Representative</span>
+                }
+                else if (user.Role == Role.EMPLOYEE)
+                {
+                    <span class="text-white">Employee</span>
+                }
+                else if (user.Role == Role.STORE_CLERK)
+                {
+                    <span class="text-white">Store Clerk</span>
+                }
+                else if (user.Role == Role.STORE_MANAGER)
+                {
+                    <span class="text-white">Store Manager</span>
+                }
+                else
+                {
+                    <span class="text-white">Store Supervisor</span>
+                }
+            </li>
+            <a href="/Account/LogOff" class="nav-item dropdown hidden-caret d-sm-none d-md-block btn btn-sm btn-light">Logout</a>
+        </ul>
+    </div>
+</nav>

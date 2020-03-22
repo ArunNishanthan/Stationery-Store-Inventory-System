@@ -1,0 +1,46 @@
+﻿@model SSIS.Models.PurchaseOrder
+
+    <div class="modal-header">
+        <h5 class="modal-title"> @Model.PurchaseOrderNumber</h5>
+        <h5 class="modal-title"> @Model.Supplier.SupplierName</h5>
+        @if (Model.PurchaseOrderStatus != SSIS.Enums.PurchaseOrderStatus.PENDING)
+        {
+            <h5 class="modal-title btn-success">Delivered </h5>
+        }
+        else
+        {
+            <h5 class="modal-title btn-danger">Pending</h5>
+
+        }
+    </div>
+
+<hr />
+<dl class="dl-horizontal">
+    <div class="container">
+        <table class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
+            <thead>
+                <tr>
+                    <th>Item Code</th>
+                    <th>Description</th>
+                    <th>Quantity</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @for (var i = 0; i < Model.PurchaseItems.Count; i++)
+                {
+                    <tr>
+                        <td>@Model.PurchaseItems[i].Item.ItemCode</td>
+                        <td>@Model.PurchaseItems[i].Item.Description</td>
+                        <td>@Model.PurchaseItems[i].Quantity</td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    </div>
+</dl>
+<div class="modal-footer">
+   
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+</div>

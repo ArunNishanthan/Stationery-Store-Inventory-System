@@ -1,0 +1,118 @@
+﻿@using SSIS.Enums
+@using SSIS.Models
+@model SSIS.View_Models.PendingRequestViewModel
+@{
+    ViewBag.Title = "Pending Requests";
+    Layout = "~/Views/Shared/Employee/_Layout.cshtml";
+
+    User user = (User)Session["usersession"];
+}
+
+<div class="text-center">
+    <h2>Pending Requests</h2>
+</div>
+
+@if (Model.RequisationForms.Count() != 0)
+{
+    <table id="tableReq" class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
+        <thead>
+            <tr>
+                <th>Request No</th>
+                @if (user.Role != Role.EMPLOYEE)
+                {
+                    <th>Requester</th>
+                }
+                <th>Requested Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (var i = 0; i < Model.RequisationForms.Count(); i++)
+            {
+                <tr>
+                    @Html.HiddenFor(m => m.RequisationForms[i].Id)
+                    <td> <a href="javascript:void(0);" class="anchorDetail" data-id="@Model.RequisationForms[i].Id">@Model.RequisationForms[i].RequestNumber</a>  </td>
+                    @if (user.Role != Role.EMPLOYEE)
+                    {
+                        <td>@Model.RequisationForms[i].RequestedBy.UserName</td>
+                    }
+                    <td>@Model.RequisationForms[i].RequestedDate.GetValueOrDefault().ToShortDateString()</td>
+                    <td>
+                        @if (Model.RequisationForms[i].FormStatus == FormStatus.PENDING_APPROVAL)
+                        {
+                            @:Pending for Approval
+                        }
+                        else if (Model.RequisationForms[i].FormStatus == FormStatus.REJECTED)
+                        {
+                            @:Rejected
+                        }
+                        else
+                        {
+                            @:Approved
+                        }
+                    </td>
+                    <td>
+                        @if (Model.RequisationForms[i].RequestedBy.UserId == user.UserId)
+                        {
+                            @:<a href="EditRequstionForm/@Model.RequisationForms[i].Id" class="btn btn-primary btn-xs text-white">Edit</a>
+                            @:<a href="DeleteRequstionForm/@Model.RequisationForms[i].Id" class="btn btn-danger btn-xs text-white">Delete</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+}
+else
+{
+    <p>No History Available</p>
+}
+<div id='myModal' class='modal'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+
+</div>
+
+@section scripts{
+
+
+    <script>
+        var TeamDetailPostBackURL = '/Employee/ItemDetailsfromForm';
+        $(function () {
+            $(".anchorDetail").click(function () {
+                var $buttonClicked = $(this);
+                var id = $buttonClicked.attr('data-id');
+                var options = { "backdrop": "static", keyboard: true };
+                $.ajax({
+                    type: "GET",
+                    url: TeamDetailPostBackURL,
+                    contentType: "application/json; charset=utf-8",
+                    data: { "Id": id },
+                    datatype: "json",
+                    success: function (data) {
+                        $('#myModalContent').html(data);
+                        $('#myModal').modal(options);
+                        $('#myModal').modal('show');
+
+                    },
+                    error: function () {
+                        alert("Dynamic content load failed.");
+                    }
+                });
+            });
+
+            $("#closbtn").click(function () {
+                $('#myModal').modal('hide');
+            });
+        });
+
+
+
+
+    </script>
+}

@@ -1,0 +1,22 @@
+Logins
+
+Email - Password
+
+Store Clerk
+S0001@gmail.com - s0001
+
+Store Supervisor
+S0005@gmail.com - s0005
+
+Store Manager
+S0006@gmail.com - s0006
+
+
+DepartmentHead
+E0001@gmail.com - e0001
+
+Represenative
+E0002@gmail.com - e0002
+
+Employee
+E0003@gmail.com - e0003

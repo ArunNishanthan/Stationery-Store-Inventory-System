@@ -1,0 +1,88 @@
+﻿@model List<SSIS.Models.PurchaseOrder>
+@{
+    ViewBag.Title = "Purchase Order History";
+    Layout = "~/Views/Shared/Store/_Layout.cshtml";
+}
+
+<div class="text-center">
+    <h2>Purchase Order History</h2>
+</div>
+
+
+@if (Model.Count > 0)
+{
+    <table id="dtTable" class="table table-bordered table-head-bg-info table-bordered-bd-info">
+        <thead>
+        <th>Purchase Order Number</th>
+        <th>Supplier</th>
+        <th>Delivery Date</th>
+        <th>Status</th>
+        <th>Action</th>
+        </thead>
+
+        <tbody>
+            @foreach (SSIS.Models.PurchaseOrder pOrder in Model)
+            {
+                <tr>
+                    <td>
+                        @pOrder.PurchaseOrderNumber
+                    </td>
+                    <td>@pOrder.Supplier.SupplierCode</td>
+                    <td>@pOrder.DeliveredDate.ToShortDateString()</td>
+                    <td>@pOrder.PurchaseOrderStatus</td>
+                    <td>
+                        <a href="javascript:void(0);" class="btn btn-xs btn-primary anchorDetail" data-id="@pOrder.Id">View</a>
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+}
+else
+{
+    <p>There is no Purchase Order to Show.</p>
+}
+
+<div id='myModal' class='modal'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+
+</div>
+@section scripts{
+    <script>
+        var TeamDetailPostBackURL = '/StoreClerk/deliveryItemDetail';
+        $(function () {
+            $(".anchorDetail").click(function () {
+                var $buttonClicked = $(this);
+                var id = $buttonClicked.attr('data-id');
+                var options = { "backdrop": "static", keyboard: true };
+                $.ajax({
+                    type: "GET",
+                    url: TeamDetailPostBackURL,
+                    contentType: "application/json; charset=utf-8",
+                    data: { "Id": id },
+                    datatype: "json",
+                    success: function (data) {
+                        $('#myModalContent').html(data);
+                        $('#myModal').modal(options);
+                        $('#myModal').modal('show');
+                    },
+                    error: function () {
+                        alert("Dynamic content load failed.");
+                    }
+                });
+            });
+            $("#closbtn").click(function () {
+                $('#myModal').modal('hide');
+            });
+        });
+        $(document).ready(function () {
+            $('#dtTable').DataTable({
+                "order": [[0, "desc"]]
+            });
+        });</script>
+}
